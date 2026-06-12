@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>English Trainer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>English Trainer</h1>
+
+    <h2>문장 추가</h2>
+
+    <input id="korean" placeholder="한국어 입력">
+
+    <br><br>
+
+    <input id="english" placeholder="영어 입력">
+
+    <br><br>
+
+    <button>저장</button>
+
+</body>
+</html>
