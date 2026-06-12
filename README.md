@@ -29,3 +29,30 @@
 - CSS
 - JavaScript
 - Google Sheets
+
+
+## Roadmap
+
+### Phase 1 (완료)
+
+- [x] Google Sheets 연동
+- [x] 랜덤 문장 출제
+- [x] 정답 보기
+
+### Phase 2 (진행 예정)
+
+- [ ] 맞음 버튼
+- [ ] 틀림 버튼
+- [ ] 다음 문제 버튼
+- [ ] 학습 기록 저장
+
+### Phase 3
+
+- [ ] 오답 우선 출제
+- [ ] 태그별 학습
+
+### Phase 4
+
+- [ ] 학습 캘린더
+- [ ] 연속 학습(Streak)
+- [ ] 월간 통계
