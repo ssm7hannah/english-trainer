@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>English Trainer</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<title>English Trainer</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -13,7 +13,7 @@
     <h1>📘 English Trainer</h1>
 
     <!-- TAB -->
-    <div class="tab-bar">
+    <div class="tab">
         <button onclick="setTab('learn')">학습</button>
         <button onclick="setTab('list')">전체문장</button>
         <button onclick="setTab('stats')">통계</button>
@@ -21,21 +21,28 @@
 
     <!-- LEARN -->
     <div id="learnView">
-        <div class="card">
+        <div class="card learn-card">
 
-            <div id="levelBadge"></div>
+            <div id="levelBadge" onclick="showLevelDetail()"></div>
 
-            <div id="sentenceId"></div>
-            <div id="koreanSentence"></div>
-            <div id="tag"></div>
+            <div class="sentence-meta">
+                <div id="sentenceId"></div>
+                <div id="tag"></div>
+            </div>
 
-            <div id="englishSentence"></div>
+            <div id="koreanSentence" class="main-sentence"></div>
 
-            <button onclick="showAnswer()">정답 보기</button>
+            <div class="divider"></div>
+
+            <div id="englishSentence" class="answer"></div>
+
+            <button class="answer-btn" onclick="showAnswer()">
+                Show Answer
+            </button>
 
             <div class="btn-group">
-                <button class="correct" onclick="submitAnswer(true)">맞음</button>
-                <button class="wrong" onclick="submitAnswer(false)">틀림</button>
+                <button class="wrong" onclick="submitAnswer(false)">Wrong</button>
+                <button class="correct" onclick="submitAnswer(true)">Correct</button>
             </div>
 
         </div>
@@ -57,12 +64,11 @@
 <div id="levelModal" class="modal hidden">
     <div class="modal-content">
         <h3 id="modalTitle"></h3>
-        <p id="modalBody"></p>
+        <pre id="modalBody"></pre>
         <button onclick="closeModal()">닫기</button>
     </div>
 </div>
 
 <script src="app.js"></script>
-
 </body>
 </html>
