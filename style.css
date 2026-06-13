@@ -1,25 +1,123 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>English Trainer</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+    background: #f4f6f8;
+    display: flex;
+    justify-content: center;
+}
 
-    <h1>English Trainer</h1>
+.app {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+}
 
-    <h2>문장 추가</h2>
+h1 {
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
 
-    <input id="korean" placeholder="한국어 입력">
+/* TAB */
+.tab-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
 
-    <br><br>
+.tab-bar button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background: #ddd;
+}
 
-    <input id="english" placeholder="영어 입력">
+/* CARD */
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
 
-    <br><br>
+/* CONTENT */
+#sentenceId {
+    font-size: 12px;
+    color: gray;
+}
 
-    <button>저장</button>
+#koreanSentence {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 10px 0;
+}
 
-</body>
-</html>
+#tag {
+    font-size: 12px;
+    color: #888;
+}
+
+/* BUTTON */
+button {
+    border: none;
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-group button {
+    flex: 1;
+    padding: 14px;
+}
+
+.correct { background: #4caf50; color: white; }
+.wrong { background: #f44336; color: white; }
+
+/* LEVEL BADGE */
+#levelBadge {
+    display: inline-block;
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+}
+
+/* LIST ITEM */
+.sentence-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+/* MODAL */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 80%;
+    max-width: 320px;
+    white-space: pre-line;
+}
+
+.hidden {
+    display: none;
+}

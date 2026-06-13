@@ -5,22 +5,64 @@
     <title>English Trainer</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-    <h1>English Trainer</h1>
+<div class="app">
 
-    <h2 id="sentenceId"></h2>
+    <h1>📘 English Trainer</h1>
 
-    <p id="koreanSentence"></p>
+    <!-- TAB -->
+    <div class="tab-bar">
+        <button onclick="setTab('learn')">학습</button>
+        <button onclick="setTab('list')">전체문장</button>
+        <button onclick="setTab('stats')">통계</button>
+    </div>
 
-    <button onclick="showAnswer()">
-        정답 보기
-    </button>
+    <!-- LEARN -->
+    <div id="learnView">
+        <div class="card">
 
-    <p id="englishSentence"></p>
+            <div id="levelBadge"></div>
 
-    <p id="tag"></p>
+            <div id="sentenceId"></div>
+            <div id="koreanSentence"></div>
+            <div id="tag"></div>
+
+            <div id="englishSentence"></div>
+
+            <button onclick="showAnswer()">정답 보기</button>
+
+            <div class="btn-group">
+                <button class="correct" onclick="submitAnswer(true)">맞음</button>
+                <button class="wrong" onclick="submitAnswer(false)">틀림</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- LIST -->
+    <div id="listView" class="hidden">
+        <div id="sentenceList" class="card"></div>
+    </div>
+
+    <!-- STATS -->
+    <div id="statsView" class="hidden">
+        <div id="statsBox" class="card"></div>
+    </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="levelModal" class="modal hidden">
+    <div class="modal-content">
+        <h3 id="modalTitle"></h3>
+        <p id="modalBody"></p>
+        <button onclick="closeModal()">닫기</button>
+    </div>
+</div>
 
 <script src="app.js"></script>
+
 </body>
 </html>
