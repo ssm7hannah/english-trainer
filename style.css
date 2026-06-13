@@ -84,14 +84,32 @@ h1 {
 ========================= */
 #sentenceId {
     font-size: 12px;
+    font-weight: 700;
     color: #999;
     margin-bottom: 6px;
+}
+
+#sentenceRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    overflow: hidden;
+}
+
+#sentenceRow span {
+    white-space: nowrap;
 }
 
 #tag {
     font-size: 12px;
     color: #888;
     margin-bottom: 10px;
+    white-space: nowrap;
+    opacity: 0.7;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
 }
 
 #koreanSentence {
@@ -106,6 +124,13 @@ h1 {
     color: #333;
     line-height: 1.6;
     min-height: 40px;
+}
+
+.eng-line {
+    padding: 6px 10px;
+    background: #f6f7fb;
+    border-radius: 8px;
+    margin-bottom: 6px;
 }
 
 /* =========================
@@ -159,8 +184,17 @@ button {
 }
 
 /* =========================
-   WCW BAR
+   LIST ITEMS
 ========================= */
+#sentenceList > div {
+    background: white;
+    padding: 12px;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+
 .bar {
     display: flex;
     height: 8px;
@@ -175,26 +209,15 @@ button {
 }
 
 .bar-seg.c {
-    background: #2ecc71;
+    background: linear-gradient(135deg, #2ecc71, #1db954);
 }
 
 .bar-seg.w {
-    background: #ff4d4f;
+    background: linear-gradient(135deg, #ff4d4f, #ff1744);
 }
 
 .bar.empty {
     background: #eee;
-}
-
-/* =========================
-   LIST ITEMS
-========================= */
-#sentenceList > div {
-    background: white;
-    padding: 12px;
-    border-radius: 14px;
-    margin-bottom: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 /* =========================
@@ -207,19 +230,489 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 999;
 }
 
 .modal-content {
     width: 85%;
     max-width: 340px;
     background: white;
-    padding: 16px;
+    padding: 10px;
     border-radius: 16px;
-    white-space: pre-line;
-    line-height: 1.5;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+
+    display: block !important;
+    text-align: left !important;
+    line-height: 1.2 !important;
+    align-items: flex-start;
 }
 
 .hidden {
     display: none !important;
+}
+
+.modal-content.compact {
+    width: 85%;
+    max-width: 340px;
+    background: white;
+    padding: 10px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+
+    line-height: 1.1;
+    font-size: 13px;
+}
+.title {
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.level-box {
+    margin: 4px 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.stats {
+    margin-top: 6px;
+    font-size: 12px;
+    opacity: 0.8;
+}
+.level-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;   /* ⭐ 줄 간격 */
+}
+
+.level-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    line-height: 1.2;
+    padding: 2px 0;
+}
+
+.level-row .desc {
+    opacity: 0.85;
+}
+
+.level-row.active {
+    opacity: 1;
+    font-weight: 600;
+}
+
+/* =========================
+   CALENDAR (DUOLINGO STYLE)
+========================= */
+
+/* 캘린더 전체 */
+#calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-top: 10px;
+}
+
+/* 요일 헤더 (이미 HTML에 있음) */
+.weekday {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 6px;
+}
+
+/* 날짜 셀 */
+#calendar .day {
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    user-select: none;
+    cursor: pointer;
+    transition: 0.15s;
+    background: #f2f3f7;
+}
+
+/* hover */
+#calendar .day:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* heat levels (듀오링고 느낌 컬러) */
+.l0 { background: #f2f3f7; color: #aaa; }
+.l1 { background: #c7f9cc; }
+.l2 { background: #80ed99; }
+.l3 { background: #38b000; color: white; }
+.l4 { background: #1b5e20; color: white; }
+
+/* 빈칸 */
+#calendar > div:empty {
+    background: transparent;
+    box-shadow: none;
+}
+
+/* detail */
+#dayDetail {
+    margin-top: 12px;
+}
+
+.detail-header {
+    margin-bottom: 12px;
+}
+
+.detail-header {
+    margin-bottom: 12px;
+}
+
+.summary-box {
+    display: flex;
+    justify-content: space-between;
+    background: #fff;
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.detail-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.detail-card {
+    background: white;
+    padding: 12px;
+    border-radius: 14px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.row-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    margin-bottom: 6px;
+}
+
+.badge {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+}
+
+.badge.ok {
+    background: #2ecc71;
+}
+
+.badge.no {
+    background: #ff4d4f;
+}
+
+.sid {
+    opacity: 0.6;
+}
+
+.ko {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.en {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.detail-empty {
+    text-align: center;
+    padding: 20px;
+    opacity: 0.6;
+}
+
+
+/* 공부한 날 = 초록 느낌 */
+.day.studied {
+    box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.4) inset;
+}
+
+/* 공부 안 한 날 */
+.day.unstudied {
+    opacity: 0.6;
+}
+
+/* 오늘 날짜 강조 (듀오링고 핵심 스타일) */
+.day.today {
+    border: 2px solid #ffcc00;
+    box-shadow: 0 0 12px rgba(255, 204, 0, 0.5);
+    transform: scale(1.05);
+    position: relative;
+}
+
+/* 오늘 날짜 살짝 펄스 느낌 */
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 rgba(255, 204, 0, 0.6); }
+    50% { box-shadow: 0 0 15px rgba(255, 204, 0, 0.9); }
+    100% { box-shadow: 0 0 0 rgba(255, 204, 0, 0.6); }
+}
+
+.day.today {
+    animation: pulse 2s infinite;
+}
+
+
+
+/* 전체 섹션 리듬 */
+.stats-section {
+    margin-bottom: 18px;
+}
+
+/* 카드 자체 breathing space */
+.card {
+    margin-bottom: 10px;
+}
+
+/* 캘린더 위쪽 공기 */
+.weekday {
+    margin-bottom: 10px;
+}
+
+/* 캘린더 자체도 분리감 */
+#calendar {
+    padding: 10px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+}
+
+/* statsView 전체 여백 */
+#statsView {
+    padding-top: 6px;
+}
+
+.section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #666;
+    margin: 14px 0 8px;
+    padding-left: 4px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.summary-item {
+    text-align: center;
+}
+
+.summary-icon {
+    font-size: 20px;
+}
+
+.summary-value {
+    font-size: 22px;
+    font-weight: 800;
+    margin-top: 4px;
+}
+
+.summary-label {
+    font-size: 11px;
+    color: #777;
+    margin-top: 2px;
+}
+
+.level-stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.level-stat-row:last-child {
+    border-bottom: none;
+}
+
+/* =========================
+   LEVEL DISTRIBUTION
+========================= */
+
+.level-dist-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.level-dist-badge {
+    min-width: 82px;
+    text-align: center;
+
+    padding: 4px 0px;
+    border-radius: 999px;
+
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+
+    flex-shrink: 0;
+}
+
+.level-dist-track {
+    flex: 1;
+    height: 15px;
+
+    background: #edf0f5;
+
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.level-dist-fill {
+    height: 100%;
+    border-radius: 999px;
+
+    transition: width 0.4s ease;
+}
+
+.level-dist-count {
+    width: 24px;
+
+    text-align: right;
+    font-size: 12px;
+    font-weight: 700;
+
+    color: #555;
+}
+
+
+/* =========================
+   MASTER PROGRESS
+========================= */
+
+.master-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.master-count {
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.master-sub {
+    color: #777;
+    font-size: 12px;
+    margin-top: 4px;
+    margin-bottom: 12px;
+}
+
+.master-track {
+    height: 12px;
+    background: #edf0f5;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.master-fill {
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        #43a047,
+        #66bb6a
+    );
+    border-radius: 999px;
+
+    transition: width 0.4s ease;
+}
+
+.master-footer {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #666;
+    font-weight: 600;
+}
+
+.sentence-korean {
+    margin-bottom: 8px;
+    line-height: 1.4;
+    cursor: pointer;
+}
+
+.sentence-korean:active {
+    opacity: 0.7;
+}
+
+.sentence-english {
+    margin-bottom: 10px;
+
+    padding: 10px;
+
+    border-radius: 10px;
+
+    background: #f7f8fb;
+
+    font-size: 14px;
+    line-height: 1.6;
+
+    color: #444;
+}
+
+/* =========================
+   HEADER ACTIONS
+========================= */
+
+.header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.header-actions {
+    display:flex;
+    gap:8px;
+}
+
+.icon-btn {
+    width:38px;
+    height:38px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border:none;
+    border-radius:12px;
+
+    background:white;
+
+    font-size:18px;
+    text-decoration:none;
+
+    cursor:pointer;
+
+    box-shadow:0 4px 12px rgba(0,0,0,0.06);
+}
+
+.icon-btn:hover {
+    transform:translateY(-1px);
 }

@@ -10,7 +10,41 @@
 
 <div class="app">
 
-    <h1>📘 English Trainer</h1>
+    <div class="header">
+
+        <h1>📘 English Trainer</h1>
+
+        <div class="header-actions">
+
+            <a
+                href="https://docs.google.com/spreadsheets/d/1gD6OEDDVH1gBIBO1iNS4_tXVJhlTdGZX5Gk8lpyHces/edit"
+                target="_blank"
+                class="icon-btn"
+                title="Add Sentence"
+            >
+                ➕
+            </a>
+
+            <button
+                class="icon-btn"
+                onclick="resetLearningData()"
+                title="Reset Data"
+            >
+                🗑️
+            </button>
+
+
+            <button
+                class="icon-btn"
+                onclick="setTab('import')"
+                title="OCR Import"
+            >
+                ⚙️
+            </button>
+
+        </div>
+
+    </div>
 
     <!-- TAB -->
     <div class="tab">
@@ -19,56 +53,141 @@
         <button onclick="setTab('stats')">통계</button>
     </div>
 
-    <!-- LEARN -->
+    <!-- =========================
+         LEARN VIEW (완전 복구)
+    ========================= -->
     <div id="learnView">
-        <div class="card learn-card">
 
-            <div id="levelBadge" onclick="showLevelDetail()"></div>
+    <div class="card">
 
-            <div class="sentence-meta">
-                <div id="sentenceId"></div>
-                <div id="tag"></div>
-            </div>
+        <!-- LEVEL BADGE -->
+        <div id="levelBadge" onclick="showLevelDetail()"></div>
 
-            <div id="koreanSentence" class="main-sentence"></div>
-
-            <div class="divider"></div>
-
-            <div id="englishSentence" class="answer"></div>
-
-            <button class="answer-btn" onclick="showAnswer()">
-                Show Answer
-            </button>
-
-            <div class="btn-group">
-                <button class="wrong" onclick="submitAnswer(false)">Wrong</button>
-                <button class="correct" onclick="submitAnswer(true)">Correct</button>
-            </div>
-
+        <!-- META -->
+        <div class="meta-row">
+            <span id="sentenceId"></span>
+            <span id="tag"></span>
         </div>
+
+        <!-- MAIN SENTENCE -->
+        <div id="koreanSentence"></div>
+
+        <div class="divider"></div>
+
+        <!-- ENGLISH -->
+        <div id="englishSentence"></div>
+
+        <button class="answer-btn" onclick="showAnswer()">
+            Show Answer
+        </button>
+
+        <!-- ACTION -->
+        <div class="btn-group">
+            <button class="wrong" onclick="submitAnswer(false)">Wrong</button>
+            <button class="correct" onclick="submitAnswer(true)">Correct</button>
+        </div>
+
     </div>
 
-    <!-- LIST -->
+    </div>
+
+    <!-- =========================
+         LIST VIEW (완전 복구)
+    ========================= -->
     <div id="listView" class="hidden">
         <div id="sentenceList" class="card"></div>
     </div>
 
-    <!-- STATS -->
+    <!-- =========================
+         STATS VIEW (캘린더 포함)
+    ========================= -->
     <div id="statsView" class="hidden">
-        <div id="statsBox" class="card"></div>
+
+        <div class="section-title">📊 Overview</div>
+        <div id="summary" class="card"></div>
+
+        <div class="section-title">🏆 Mastery</div>
+        <div id="masterProgress" class="card"></div>
+
+        <div class="section-title">📈 Levels</div>
+        <div id="levelStats" class="card"></div>
+
+
+
+        <div class="section-title">📅 Calendar</div>
+        <div class="stats-section">
+            <div class="weekday">
+                <div>Sun</div>
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
+            </div>
+
+            <div id="calendar"></div>
+        </div>
+
+        <div class="stats-section">
+            <div id="dayDetail" class="card hidden"></div>
+        </div>
+
     </div>
+
+    <!-- OCR IMPORT -->
+    <div id="importView" class="hidden">
+
+        <div class="card">
+
+            <h3>📚 OCR Import</h3>
+
+            <textarea
+                id="ocrInput"
+                placeholder="OCR 텍스트 붙여넣기"
+                style="
+                    width:100%;
+                    height:250px;
+                    padding:10px;
+                    box-sizing:border-box;
+                "
+            ></textarea>
+
+            <div style="margin-top:10px; display:flex; gap:8px;">
+
+                <button onclick="convertOcrText()">
+                    Convert
+                </button>
+
+                <button onclick="copyTsv()">
+                    Copy TSV
+                </button>
+
+            </div>
+
+            <textarea
+                id="ocrOutput"
+                readonly
+                style="
+                    width:100%;
+                    height:250px;
+                    margin-top:10px;
+                    padding:10px;
+                    box-sizing:border-box;
+                "
+            ></textarea>
+
+        </div>
+
+    </div>
+
 
 </div>
 
-<!-- MODAL -->
-<div id="levelModal" class="modal hidden">
-    <div class="modal-content">
-        <h3 id="modalTitle"></h3>
-        <pre id="modalBody"></pre>
-        <button onclick="closeModal()">닫기</button>
-    </div>
-</div>
+
+
 
 <script src="app.js"></script>
+<div id="levelModal" class="modal hidden"></div>
 </body>
 </html>
