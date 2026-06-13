@@ -22,6 +22,8 @@ const Controller = {
     async init() {
         this.loadState();
         await this.loadSentences();
+        this.populateSourceFilter();
+        this.populateListSourceFilter();
         this.next();
     },
 
@@ -39,6 +41,60 @@ const Controller = {
         );
         Model.sentences = await res.json();
     },
+
+
+    populateSourceFilter() {
+
+        const select =
+            document.getElementById("sourceFilter");
+
+        const sources = [
+            ...new Set(
+                Model.sentences
+                    .map(s => s.Source)
+                    .filter(Boolean)
+            )
+        ].sort();
+
+        select.innerHTML =
+            `<option value="ALL">전체</option>`;
+
+        sources.forEach(source => {
+
+            select.innerHTML +=
+                `<option value="${source}">
+                    ${source}
+                </option>`;
+        });
+    },
+
+
+    populateListSourceFilter() {
+
+    const select =
+        document.getElementById("listSourceFilter");
+
+    const sources = [
+        ...new Set(
+            Model.sentences
+                .map(s => s.Source)
+                .filter(Boolean)
+        )
+    ].sort();
+
+    select.innerHTML =
+        `<option value="ALL">전체</option>`;
+
+    sources.forEach(source => {
+
+        select.innerHTML +=
+            `<option value="${source}">
+                ${source}
+            </option>`;
+    });
+},
+
+
 
     computeLevel(info) {
         if (!info) return "L2";
@@ -60,22 +116,69 @@ const Controller = {
     },
 
     pick() {
-    const groups = { L1: [], L2: [], L3: [], L4: [], L5: [] };
 
-    Model.sentences.forEach(s => {
-        const id = String(s.ID);
-        const info = Model.state[id] || { correct: 0, wrong: 0 };
+        const selectedSource =
+            document.getElementById("sourceFilter")?.value
+            || "ALL";
 
-        const total = info.correct + info.wrong;
-        const wrongRatio = total === 0 ? 0 : info.wrong / total;
+        const groups = {
+            L1: [],
+            L2: [],
+            L3: [],
+            L4: [],
+            L5: []
+        };
 
-        const lvl = this.computeLevel(info);
+        let candidates = Model.sentences;
 
-        groups[lvl].push({
-            ...s,
-            _wrongRatio: wrongRatio
+        if (selectedSource !== "ALL") {
+            candidates = candidates.filter(
+                s => s.Source === selectedSource
+            );
+        }
+
+        const keyword =
+            document.getElementById("searchBox")?.value
+                .trim()
+                .toLowerCase() || "";
+
+        if (keyword) {
+
+            filtered = filtered.filter(s => {
+
+                const text = [
+                    s.Korean || "",
+                    s.English || "",
+                    s.Note || "",
+                    s.Source || "",
+                    s.Tags || ""
+                ]
+                .join(" ")
+                .toLowerCase();
+
+                return text.includes(keyword);
+            });
+        }
+
+        candidates.forEach(s => {
+
+            const id = String(s.ID);
+            const info = Model.state[id] || {
+                correct: 0,
+                wrong: 0
+            };
+
+            const total = info.correct + info.wrong;
+            const wrongRatio =
+                total === 0 ? 0 : info.wrong / total;
+
+            const lvl = this.computeLevel(info);
+
+            groups[lvl].push({
+                ...s,
+                _wrongRatio: wrongRatio
+            });
         });
-    });
 
     const pickFromGroup = (arr) => {
         if (arr.length === 0) return null;
@@ -118,6 +221,8 @@ const Controller = {
         document.getElementById("koreanSentence").innerText = s.Korean;
         document.getElementById("tag").innerText = s.Tags;
         document.getElementById("englishSentence").innerHTML = "";
+        document.getElementById("noteBox").classList.add("hidden");
+        document.getElementById("source").innerText = s.Source;
 
         const badge = document.getElementById("levelBadge");
         badge.innerText = ui.text;
@@ -187,7 +292,42 @@ function renderList() {
 
     const order = { L1: 1, L2: 2, L3: 3, L4: 4, L5: 5 };
 
-    const sorted = [...Model.sentences].sort((a, b) => {
+    const selectedSource =
+        document.getElementById("listSourceFilter")?.value
+        || "ALL";
+
+    let filtered = [...Model.sentences];
+
+    if (selectedSource !== "ALL") {
+        filtered = filtered.filter(
+            s => s.Source === selectedSource
+        );
+    }
+
+    const keyword =
+        document.getElementById("searchBox")?.value
+            .trim()
+            .toLowerCase() || "";
+
+    if (keyword) {
+
+        filtered = filtered.filter(s => {
+
+            const text = [
+                s.Korean || "",
+                s.English || "",
+                s.Note || "",
+                s.Source || "",
+                s.Tags || ""
+            ]
+            .join(" ")
+            .toLowerCase();
+
+            return text.includes(keyword);
+        });
+    }
+
+    const sorted = filtered.sort((a, b) => {
         const la = Controller.computeLevel(Model.state[String(a.ID)]);
         const lb = Controller.computeLevel(Model.state[String(b.ID)]);
         return order[la] - order[lb];
@@ -254,6 +394,17 @@ function renderList() {
             ${s.Tags}
         </span>
 
+        <span style="
+            padding:2px 6px;
+            border-radius:999px;
+            font-size:11px;
+            background:#f1f3f5;
+            color:#666;
+            flex-shrink:0;
+        ">
+            ${s.Source}
+</span>
+
     </div>
 
     <div
@@ -265,11 +416,29 @@ function renderList() {
 </div>
 
     <div
-        id="eng-${s.ID}"
-        class="sentence-english hidden"
-    >
-        ${s.English.replaceAll("|","<br>")}
-    </div>
+    id="eng-${s.ID}"
+    class="sentence-english hidden"
+>
+    ${s.English.replaceAll("|","<br>")}
+
+    ${
+        s.Note
+        ? `
+        <div style="
+            margin-top:10px;
+            padding:8px;
+            border-radius:8px;
+            background:#f5f5f5;
+            font-size:13px;
+            line-height:1.5;
+        ">
+            💡 ${s.Note}
+        </div>
+        `
+        : ""
+    }
+
+</div>
 
         ${renderBar(info, s.ID)}
 
@@ -804,6 +973,16 @@ function showAnswer() {
     const el = document.getElementById("englishSentence");
 
     const s = Model.currentSentence.English || "";
+    const note = Model.currentSentence.Note;
+
+    if (note && note.trim()) {
+
+        document.getElementById("noteText")
+            .innerText = note;
+
+        document.getElementById("noteBox")
+            .classList.remove("hidden");
+    }
 
     el.innerHTML = s
     .split("|")

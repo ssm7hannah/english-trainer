@@ -716,3 +716,12 @@ button {
 .icon-btn:hover {
     transform:translateY(-1px);
 }
+
+#noteBox {
+    margin-top:12px;
+    padding:10px;
+    border-radius:8px;
+    background:#f5f5f5;
+    font-size:14px;
+    line-height:1.5;
+}

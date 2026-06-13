@@ -58,7 +58,13 @@
     ========================= -->
     <div id="learnView">
 
-    <div class="card">
+        <div style="margin-bottom:10px;">
+            <select id="sourceFilter" onchange="Controller.next()">
+                <option value="ALL">전체</option>
+            </select>
+        </div>
+
+        <div class="card">
 
         <!-- LEVEL BADGE -->
         <div id="levelBadge" onclick="showLevelDetail()"></div>
@@ -67,6 +73,7 @@
         <div class="meta-row">
             <span id="sentenceId"></span>
             <span id="tag"></span>
+            <span id="source"></span>
         </div>
 
         <!-- MAIN SENTENCE -->
@@ -76,6 +83,10 @@
 
         <!-- ENGLISH -->
         <div id="englishSentence"></div>
+
+        <div id="noteBox" class="hidden">
+            <span id="noteText"></span>
+        </div>
 
         <button class="answer-btn" onclick="showAnswer()">
             Show Answer
@@ -95,7 +106,37 @@
          LIST VIEW (완전 복구)
     ========================= -->
     <div id="listView" class="hidden">
+
+        <div style="
+            display:flex;
+            gap:8px;
+            margin-bottom:10px;
+        ">
+
+            <select
+                id="listSourceFilter"
+                onchange="renderList()"
+            >
+                <option value="ALL">전체</option>
+            </select>
+
+            <input
+                id="searchBox"
+                type="text"
+                placeholder="검색..."
+                oninput="renderList()"
+                style="
+                    flex:1;
+                    padding:8px;
+                    border:1px solid #ddd;
+                    border-radius:8px;
+                "
+            />
+
+        </div>
+
         <div id="sentenceList" class="card"></div>
+
     </div>
 
     <!-- =========================
