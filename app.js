@@ -1027,13 +1027,13 @@ function resetLearningData() {
 
 function convertOcrText() {
 
-    const input =
-        document.getElementById("ocrInput").value;
+    const input = document.getElementById("ocrInput").value;
 
     const text = input
+        .replace(/\r/g, "")
         .replace(/\n/g, " ")
+        .replace(/[•◦·○]/g, " ")
         .replace(/\s+/g, " ")
-        .replace(/•/g, " ")
         .trim();
 
     const result = [];
@@ -1042,66 +1042,609 @@ function convertOcrText() {
     let korean = "";
 
     let mode = null;
+    let noteMode = false;
+    let noteBuffer = "";
+
+    const savePair = () => {
+
+        if (
+            english.trim().length > 0 &&
+            korean.trim().length > 0
+        ) {
+
+            result.push({
+                korean: korean.trim(),
+                english: english.trim(),
+                note: ""
+            });
+        }
+
+        english = "";
+        korean = "";
+    };
 
     const chars = [...text];
 
-    chars.forEach(char => {
+    for (let i = 0; i < chars.length; i++) {
 
-        const isKorean = /[가-힣]/.test(char);
+        const char = chars[i];
+
+        // --------------------
+        // note 시작
+        // --------------------
+        if (char === "#") {
+
+            noteMode = true;
+            noteBuffer = "";
+
+            continue;
+        }
+
+        // --------------------
+        // note 수집
+        // --------------------
+        if (noteMode) {
+
+            // note 끝:
+            // 영어 대문자로 새 문장이 시작되는 경우
+            const nextText = text.slice(i);
+
+            const newSentence =
+                /^[A-Z]/.test(char);
+
+            if (
+                newSentence &&
+                result.length > 0 &&
+                noteBuffer.length > 10
+            ) {
+
+                result[result.length - 1].note =
+                    noteBuffer.trim();
+
+                noteMode = false;
+
+                // 현재 문자 다시 처리
+                i--;
+                continue;
+            }
+
+            noteBuffer += char;
+            continue;
+        }
+
+        // 숫자 토큰 처리
+    if (/[0-9]/.test(char)) {
+
+        let numberToken = char;
+        let j = i + 1;
+
+        // 연속 숫자 수집
+        while (
+            j < chars.length &&
+            /[0-9]/.test(chars[j])
+        ) {
+            numberToken += chars[j];
+            j++;
+        }
+
+        // 숫자 뒤 첫 의미있는 문자 찾기
+        let k = j;
+
+        while (
+            k < chars.length &&
+            /\s/.test(chars[k])
+        ) {
+            k++;
+        }
+
+        const nextChar = chars[k] || "";
+
+        if (/[가-힣]/.test(nextChar)) {
+            korean += numberToken;
+        } else {
+            english += numberToken;
+        }
+
+        // 숫자들을 이미 처리했으므로 건너뜀
+        i = j - 1;
+        continue;
+    }
+
         const isEnglish = /[A-Za-z]/.test(char);
+        const isKorean = /[가-힣]/.test(char);
 
+
+        // --------------------
+        // 영어 시작
+        // --------------------
         if (isEnglish) {
 
             if (mode === "korean") {
 
+                // 이미 영어+한글이 있으면 저장
                 if (
-                    english.trim().length > 5 &&
-                    korean.trim().length > 1
+                    english.trim().length > 0 &&
+                    korean.trim().length > 0
                 ) {
-                    result.push(
-                        `${korean.trim()}\t${english.trim()}\tbook`
-                    );
+                    savePair();
                 }
-
-                english = "";
-                korean = "";
             }
 
             mode = "english";
             english += char;
+            continue;
         }
 
-        else if (isKorean) {
+        // --------------------
+        // 한글
+        // --------------------
+        if (isKorean) {
 
             mode = "korean";
             korean += char;
+            continue;
         }
 
-        else {
+        // --------------------
+        // 기타 문자
+        // --------------------
 
-            if (mode === "english") {
-                english += char;
-            }
 
-            if (mode === "korean") {
-                korean += char;
-            }
+        if (mode === "english") {
+            english += char;
         }
 
-    });
-
-    if (
-        english.trim().length > 5 &&
-        korean.trim().length > 1
-    ) {
-        result.push(
-            `${korean.trim()}\t${english.trim()}\tlive academy`
-        );
+        if (mode === "korean") {
+            korean += char;
+        }
     }
 
+    // 마지막 note 저장
+    if (
+        noteMode &&
+        result.length > 0
+    ) {
+        result[result.length - 1].note =
+            noteBuffer.trim();
+    }
+
+    // 마지막 pair 저장
+    savePair();
+
+    // 출력
+    const output = result.map(item =>
+        `${item.korean}\t${item.english}\t${item.note}\tbook`
+    );
+
     document.getElementById("ocrOutput").value =
-        result.join("\n");
+        output.join("\n");
 }
+
+// 되긴되는데 다시
+// function convertOcrText() {
+
+//     const input = document.getElementById("ocrInput").value;
+
+//     console.log("🔥 START");
+
+//     // 1. 기본 정리
+//     const cleaned = input
+//         .replace(/\n/g, " ")
+//         .replace(/\s+/g, " ")
+//         .trim();
+
+//     console.log("🧹 cleaned:", cleaned);
+
+//     // 2. 문장 단위 분리 (• 기준)
+//     const chunks = cleaned
+//         .split("•")
+//         .map(s => s.trim())
+//         .filter(Boolean);
+
+//     console.log("🔪 chunks:", chunks);
+
+//     const result = [];
+
+//     for (let chunk of chunks) {
+
+//         console.log("\n➡️ chunk:", chunk);
+
+//         let note = "";
+//         let main = chunk;
+
+//         // 3. note 분리 (# 기준)
+//         if (main.includes("#")) {
+//             const parts = main.split("#");
+//             main = parts[0].trim();
+//             note = parts.slice(1).join(" ").trim();
+//         }
+
+//         console.log("   main:", main);
+//         console.log("   note:", note);
+
+//         // 4. * 제거 (의미 없음)
+//         // main = main.replace(/\*/g, "");
+
+//         // 5. 한글 / 영어 분리
+//         const koreanMatch = main.match(/[가-힣][^A-Za-z]*/g);
+//         const englishMatch = main.match(/[A-Za-z][^가-힣]*/g);
+
+//         const korean = (koreanMatch || []).join(" ").trim();
+//         const english = (englishMatch || []).join(" ").trim();
+
+//         console.log("   korean:", korean);
+//         console.log("   english:", english);
+
+//         // 6. validation
+//         if (!korean || !english) {
+//             console.log("⚠️ SKIP (invalid pair)");
+//             continue;
+//         }
+
+//         // 7. 최종 출력
+//         const row = `${korean}\t${english}\t${note}\tbook`;
+
+//         console.log("✅ row:", row);
+
+//         result.push(row);
+//     }
+
+//     // 8. 출력
+//     document.getElementById("ocrOutput").value =
+//         result.join("\n");
+
+//     console.log("🏁 DONE");
+// }
+
+// function convertOcrText() {
+
+//     console.log("🔥 convertOcrText START");
+
+//     const input = document.getElementById("ocrInput")?.value;
+
+//     console.log("📥 input length:", input?.length);
+//     console.log("📥 input preview:", input?.slice(0, 100));
+
+//     if (!input) {
+//         console.log("❌ input is empty or undefined");
+//         return;
+//     }
+
+//     const text = input
+//         .replace(/\n/g, " ")
+//         .replace(/\s+/g, " ")
+//         .replace(/•/g, " ")
+//         .trim();
+
+//     console.log("🧹 cleaned text preview:", text.slice(0, 100));
+
+//     const result = [];
+
+//     let english = "";
+//     let korean = "";
+//     let note = "";
+
+//     let mode = null;
+//     let isNote = false;
+
+//     const flush = () => {
+
+//         console.log("🚨 FLUSH CALL");
+//         console.log("   english:", english);
+//         console.log("   korean:", korean);
+//         console.log("   note:", note);
+
+//         if (english.trim().length > 5 && korean.trim().length > 1) {
+//             const row = `${korean.trim()}\t${english.trim()}\t${note.trim()}\tbook`;
+//             console.log("✅ PUSH ROW:", row);
+//             result.push(row);
+//         } else {
+//             console.log("⚠️ SKIPPED (too short)");
+//         }
+
+//         english = "";
+//         korean = "";
+//         note = "";
+//         mode = null;
+//         isNote = false;
+//     };
+
+//     const chars = [...text];
+
+//     console.log("🔄 total chars:", chars.length);
+
+//     chars.forEach((char, idx) => {
+
+//         // 🔥 위치 추적
+//         if (idx < 30) {
+//             console.log(`[${idx}] char:`, char);
+//         }
+
+//         // 1. note 시작
+//         if (char === "#") {
+//             console.log("🔥 NOTE START at index", idx);
+//             isNote = true;
+//             return;
+//         }
+
+//         // 2. note 처리
+//         if (isNote) {
+//             note += char;
+//             return;
+//         }
+
+//         const isEnglish = /[A-Za-z]/.test(char);
+//         const isKorean = /[가-힣]/.test(char);
+
+//         // 3. 영어
+//         if (isEnglish) {
+
+//             if (mode === "korean") {
+//                 console.log("🔁 KOREAN → ENGLISH FLUSH");
+//                 flush();
+//             }
+
+//             mode = "english";
+//             english += char;
+//             return;
+//         }
+
+//         // 4. 한글
+//         if (isKorean) {
+
+//             if (mode === "english") {
+//                 console.log("🔁 ENGLISH → KOREAN FLUSH");
+//                 flush();
+//             }
+
+//             mode = "korean";
+//             korean += char;
+//             return;
+//         }
+
+//         // 5. 기타 문자
+//         if (mode === "english") english += char;
+//         if (mode === "korean") korean += char;
+//     });
+
+//     console.log("🏁 FINAL FLUSH");
+//     flush();
+
+//     console.log("📦 FINAL RESULT:", result);
+
+//     document.getElementById("ocrOutput").value =
+//         result.join("\n");
+
+//     console.log("✅ DONE");
+// }
+
+// 안됨
+// function convertOcrText() {
+
+//     const input = document.getElementById("ocrInput").value;
+
+//     const text = input
+//         .replace(/\n/g, " ")
+//         .replace(/\s+/g, " ")
+//         .trim();
+
+//     const result = [];
+
+//     let ko = "";
+//     let en = "";
+//     let note = "";
+//     let tag = "book";
+
+//     let mode = null;
+
+//     const flush = () => {
+
+//         if (ko.trim() && en.trim()) {
+//             result.push(
+//                 `${ko.trim()}\t${en.trim()}\t${note.trim()}\t${tag}`
+//             );
+//         }
+
+//         ko = "";
+//         en = "";
+//         note = "";
+//         mode = null;
+//     };
+
+//     const isKorean = (c) => /[가-힣]/.test(c);
+//     const isEnglish = (c) => /[A-Za-z]/.test(c);
+
+//     for (let char of text) {
+
+//         // 1. note 시작 (#)
+//         if (char === "#") {
+//             flush();
+//             mode = "note";
+//             continue;
+//         }
+
+//         // 2. 영어
+//         if (isEnglish(char)) {
+
+//             if (mode === "korean") flush();
+//             if (mode === "note") mode = null;
+
+//             mode = "english";
+//             en += char;
+//             continue;
+//         }
+
+//         // 3. 한글
+//         if (isKorean(char)) {
+
+//             if (mode === "english") flush();
+//             if (mode === "note") mode = null;
+
+//             mode = "korean";
+//             ko += char;
+//             continue;
+//         }
+
+//         // 4. note 수집
+//         if (mode === "note") {
+//             note += char;
+//             continue;
+//         }
+
+//         // 5. 기타는 그대로 붙임
+//         if (mode === "english") en += char;
+//         if (mode === "korean") ko += char;
+//     }
+
+//     flush();
+
+//     document.getElementById("ocrOutput").value =
+//         result.join("\n");
+// }
+
+// 되는데 노트가 다른줄에 붙음
+// function convertOcrText() {
+
+//     const input =
+//         document.getElementById("ocrInput").value;
+
+//     const text = input
+//         .replace(/\n/g, " ")
+//         .replace(/\s+/g, " ")
+//         .replace(/•/g, " ")
+//         .trim();
+
+//     const result = [];
+
+//     let english = "";
+//     let korean = "";
+
+//     let mode = null;
+
+//     const chars = [...text];
+
+//     chars.forEach(char => {
+
+//         const isKorean = /[가-힣]/.test(char);
+//         const isEnglish = /[A-Za-z]/.test(char);
+
+//         if (isEnglish) {
+
+//             if (mode === "korean") {
+
+//                 if (
+//                     english.trim().length > 5 &&
+//                     korean.trim().length > 1
+//                 ) {
+//                     result.push(
+//                         `${korean.trim()}\t${english.trim()}\tbook`
+//                     );
+//                 }
+
+//                 english = "";
+//                 korean = "";
+//             }
+
+//             mode = "english";
+//             english += char;
+//         }
+
+//         else if (isKorean) {
+
+//             mode = "korean";
+//             korean += char;
+//         }
+
+//         else {
+
+//             if (mode === "english") {
+//                 english += char;
+//             }
+
+//             if (mode === "korean") {
+//                 korean += char;
+//             }
+//         }
+
+//     });
+
+//     if (
+//         english.trim().length > 5 &&
+//         korean.trim().length > 1
+//     ) {
+//         result.push(
+//             `${korean.trim()}\t${english.trim()}\tlive academy`
+//         );
+//     }
+
+//     document.getElementById("ocrOutput").value =
+//         result.join("\n");
+// }
+
+// function convertOcrText() {
+
+//     const input = document.getElementById("ocrInput").value;
+
+//     const text = input
+//         .replace(/\n/g, " ")
+//         .replace(/\s+/g, " ")
+//         .trim();
+
+//     const result = [];
+
+//     let english = "";
+//     let korean = "";
+//     let mode = null;
+
+//     const flush = () => {
+//         if (english.trim() && korean.trim()) {
+//             result.push(`${korean.trim()}\t${english.trim()}`);
+//         }
+//         english = "";
+//         korean = "";
+//     };
+
+//     for (let char of text) {
+
+//         const isKorean = /[가-힣]/.test(char);
+//         const isEnglish = /[A-Za-z]/.test(char);
+
+//         // 1. 영어
+//         if (isEnglish) {
+
+//             if (mode === "korean") {
+//                 flush();
+//             }
+
+//             mode = "english";
+//             english += char;
+//             continue;
+//         }
+
+//         // 2. 한글
+//         if (isKorean) {
+
+//             if (mode === "english") {
+//                 flush();
+//             }
+
+//             mode = "korean";
+//             korean += char;
+//             continue;
+//         }
+
+//         // 3. 기타 문자 (., •, *, # 등)
+//         // 👉 그냥 현재 buffer에 붙여줌
+//         if (mode === "english") english += char;
+//         if (mode === "korean") korean += char;
+//     }
+
+//     // 마지막 flush
+//     flush();
+
+//     document.getElementById("ocrOutput").value =
+//         result.join("\n");
+// }
 
 async function copyTsv() {
 
